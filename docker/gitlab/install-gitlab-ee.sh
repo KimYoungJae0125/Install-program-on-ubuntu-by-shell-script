@@ -17,8 +17,6 @@ do
 	fi
 done
 
-GITLAB_IMAGE_NAME=gitlab/gitlab-ee
-
 GITLAB_IMAGE=$(sudo docker images | grep $GITLAB_IMAGE_NAME | awk '{ print $1 }')
 echo "Gitlab image : $GITLAB_IMAGE"
 if [ -z $GITLAB_IMAGE ];then
@@ -28,15 +26,16 @@ if [ -z $GITLAB_IMAGE ];then
 	sudo docker pull $GITLAB_IMAGE_NAME
 fi
 
-GITLAB_CONTAINER_NAME=gitlab-docker
 GITLAB_CONTAINER_ID=$(sudo docker ps -a | grep $GITLAB_CONTAINER_NAME | awk '{ print $1 }')
+echo "Gitlab container ID : $GITLAB_CONTAINER_ID"
 
-if [ -z $GITLAB_CONTAINER_ID ];then
+if [ -n $GITLAB_CONTAINER_ID ];then
 	echo "========================"
 	echo "Stop & Remove gitlab container"
 	echo "========================"
 	sudo docker stop $GITLAB_CONTAINER_ID
 	sudo docker rm $GITLAB_CONTAINER_ID
+fi
 
 ##-d [--detach] : 백그라운드에서 컨테이너 실행 후 컨테이너 ID 인쇄
 ##-h [--hostname] : 깃 랩에서 사용할 도메인
@@ -48,10 +47,10 @@ if [ -z $GITLAB_CONTAINER_ID ];then
 
 sudo docker run -d \
 	-h gitlab.example.com \
-	-p 9090:80 -p 9022:22 \
+	-p 9080:80 -p 9022:22 \
 	--name $GITLAB_CONTAINER_NAME \
 	--restart always \
 	-v $GIT_LAB_VOLUME/config:/etc/gitlab \
 	-v $GIT_LAB_VOLUME/logs:/var/log/gitlab \
 	-v $GIT_LAB_VOLUME/data:/var/opt/gitlab \
-	gitlab/gitlab-ee:latest
+	$GITLAB_IMAGE_NAME
