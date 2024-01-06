@@ -26,5 +26,6 @@ sudo docker run -it \
 		--name nginx-docker \
 		-d \
 		-p 80:80 \
+		--add-host=host.docker.internal:host-gateway \
 		nginx
 
